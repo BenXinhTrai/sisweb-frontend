@@ -1,0 +1,58 @@
+/* =========================================
+   ESTILOS COMPONENTE BUTTON (Button.css)
+========================================= */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    outline: none;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.4);
+}
+
+.btn-primary {
+    background-color: #1565C0;
+    /* Azul principal SISWEB */
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background-color: #0d47a1;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 2px solid #1565C0;
+    color: #1565C0;
+}
+
+.btn-secondary:hover {
+    background-color: #E3F2FD;
+}
+
+.btn-danger {
+    background-color: #D32F2F;
+    /* Rojo para errores/eliminar */
+    color: #FFFFFF;
+}
+
+.btn-danger:hover {
+    background-color: #b71c1c;
+}
+
+.btn-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}

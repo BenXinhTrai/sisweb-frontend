@@ -1,0 +1,46 @@
+/* =========================================
+   ESTILOS COMPONENTE CARD (Card.css)
+========================================= */
+.card-container {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    /* Sombra suave para dar profundidad */
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    color: #212121;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Para que las cards en una misma fila tengan igual altura */
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #fafafa;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #1565C0;
+    /* Títulos en el color principal */
+}
+
+.card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    /* Permite que el cuerpo ocupe el espacio disponible */
+}
+
+.card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f0f0f0;
+    background-color: #fafafa;
+    display: flex;
+    justify-content: flex-end;
+    /* Alinea los botones a la derecha */
+    gap: 1rem;
+}

@@ -1,0 +1,13 @@
+/* src/index.css */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* Tipografía limpia */
+  background-color: #F5F5F5;
+  /* Fondo general del dashboard */
+  color: #212121;
+}
+
+* {
+  box-sizing: border-box;
+}

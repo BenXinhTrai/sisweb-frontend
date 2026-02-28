@@ -1,0 +1,100 @@
+/* =========================================
+   ESTILOS ESPECÍFICOS: PÁGINA DE LOGIN (Login.css)
+========================================= */
+
+/* Fondo degradado que cubre toda la pantalla y centra la tarjeta */
+.login-wrapper {
+    background: linear-gradient(135deg, #1565C0, #42A5F5);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+/* Tarjeta principal blanca */
+.login-container {
+    background: #FFFFFF;
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Sección del logo y título */
+.login-logo {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-logo h1 {
+    color: #1565C0;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.login-logo p {
+    color: #666666;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Estilos para el selector de Rol (Select) */
+.select-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.2rem;
+    width: 100%;
+}
+
+.select-label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #212121;
+    font-size: 0.95rem;
+}
+
+.select-control {
+    padding: 0.75rem 1rem;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.select-control:focus {
+    border-color: #1565C0;
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.2);
+}
+
+/* Botones inferiores (Recuperar contraseña / Registro) */
+.login-links {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: center;
+}
+
+.link-button {
+    color: #1565C0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    transition: color 0.3s ease;
+}
+
+.link-button:hover {
+    text-decoration: underline;
+    color: #0d47a1;
+}
