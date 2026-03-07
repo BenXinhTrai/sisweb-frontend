@@ -15,7 +15,6 @@ export const Login = () => {
     // ========================================================
     // Guardan el valor de los inputs en tiempo real. 
     // Inician como strings vacíos ('').
-    const [tipoUsuario, setTipoUsuario] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -31,51 +30,69 @@ export const Login = () => {
      * Explica la lógica de validación y redirección basada en roles.
      * @param {Event} e - Evento nativo del formulario
      */
-    const handleSubmit = (e) => {
-        // PASO 1: Prevenir el comportamiento por defecto del HTML (recargar la página)
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // PASO 2: Validación básica de campos obligatorios
-        if (!tipoUsuario || !email || !password) {
+        // Validación de campos vacíos
+        if (!email || !password) {
             setError('Por favor complete todos los campos obligatorios.');
-            return; // Detiene la ejecución si faltan datos
+            return;
         }
 
-        // Limpiamos los errores si todo está correcto
-        setError('');
+        setError(''); // Limpiamos errores previos
 
-        // PASO 3: Simulación de petición al Backend
-        console.log('Autenticando usuario con datos:', { tipoUsuario, email, password });
+        try {
+            // Petición POST a tu API de Login
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-        // PASO 4: Lógica de redirección (Enrutamiento según el rol)
-        switch (tipoUsuario) {
-            case 'participante':
-                // Dirige al catálogo e inscripciones
-                window.location.href = '/dashboard-participante';
-                break;
-            case 'coordinador_seminarios':
-                // Dirige a la gestión de eventos y ponentes
-                window.location.href = '/dashboard-coordinador-seminarios';
-                break;
-            case 'coordinador_recursos':
-                // Dirige al módulo de inventario de recursos físicos/audiovisuales
-                window.location.href = '/dashboard-coordinador-recursos';
-                break;
-            case 'administrador':
-                // Dirige al control total del sistema y usuarios
-                window.location.href = '/dashboard-administrador';
-                break;
-            default:
-                setError('El rol seleccionado no es válido.');
+            const data = await response.json();
+
+            // =========================================================
+            // REQUERIMIENTO SENA: VALIDACIÓN DE MENSAJES EXACTOS
+            // =========================================================
+            if (response.ok && data.mensaje === 'autenticación satisfactoria') {
+                // Mostramos el mensaje de éxito requerido
+                alert(data.mensaje);
+
+                // Extraemos el rol directamente desde la base de datos
+                const rolReal = data.usuario.rol;
+
+                // Redirección dinámica según el rol del usuario en la BD
+                if (rolReal === 'participante') {
+                    window.location.href = '/dashboard-participante';
+                } else if (rolReal === 'coordinador') {
+                    window.location.href = '/dashboard-coordinador-seminarios';
+                } else if (rolReal === 'administrador') {
+                    window.location.href = '/dashboard-administrador';
+                } else {
+                    window.location.href = '/dashboard-participante'; // Ruta por defecto
+                }
+            } else {
+                // Mostramos el mensaje de error exacto requerido por el SENA
+                setError(data.mensaje || 'error en la autenticación');
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+            setError('error en la autenticación'); // Fallback de error requerido
         }
     };
 
-    // Funciones secundarias para los enlaces
+    // ========================================================
+    // FUNCIONES SECUNDARIAS (Navegación)
+    // ========================================================
     const handleRecuperarPassword = () => {
-        alert('Redirigiendo a recuperación de contraseña...');
+        // Nos lleva a la página de recuperar contraseña
+        window.location.href = '/recuperar-password';
     };
 
     const handleRegistro = () => {
+        // Nos lleva a la página de registro
         window.location.href = '/registro';
     };
 
@@ -97,28 +114,6 @@ export const Login = () => {
 
                 {/* Formulario conectado a la función handleSubmit */}
                 <form onSubmit={handleSubmit} noValidate>
-
-                    {/* Selector de Tipo de Usuario */}
-                    {/* Se usa HTML estándar con clases similares al InputText ya que es un <select> */}
-                    <div className="select-group">
-                        <label htmlFor="tipoUsuario" className="select-label">
-                            Tipo de Usuario
-                        </label>
-                        <select
-                            id="tipoUsuario"
-                            className="select-control"
-                            value={tipoUsuario}
-                            onChange={(e) => setTipoUsuario(e.target.value)} // Actualiza el estado
-                            required
-                        >
-                            <option value="" disabled>Seleccione su rol...</option>
-                            <option value="participante">Participante</option>
-                            <option value="coordinador_seminarios">Coordinador de Seminarios</option>
-                            <option value="coordinador_recursos">Coordinador de Recursos</option>
-                            <option value="administrador">Administrador del Sistema</option>
-                        </select>
-                    </div>
-
                     {/* Componente Personalizado: InputText (Email) */}
                     <InputText
                         id="email"

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './Button.css'; // Asegúrate de crear este archivo o integrar las clases en tu CSS global
+import './Button.css';
 
 /**
  * Componente funcional Button

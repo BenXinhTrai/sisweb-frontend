@@ -1,0 +1,29 @@
+.registro-wrapper {
+    background: linear-gradient(135deg, #1565C0, #42A5F5);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.registro-container {
+    background: #FFFFFF;
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 500px;
+}
+
+.registro-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #1565C0;
+}
+
+.registro-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
