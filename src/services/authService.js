@@ -4,8 +4,11 @@ export const authService = {
   login: (email, password) => 
     apiFetch('/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
 
-  registro: (email, password, rol) => 
-    apiFetch('/registro', { method: 'POST', body: JSON.stringify({ email, password, rol }) }),
+  registro: (data) => {
+    // Mapeamos 'tipoUsuario' a 'rol' para coincidir con la convención del backend
+    const payload = { ...data, rol: data.tipoUsuario };
+    return apiFetch('/registro', { method: 'POST', body: JSON.stringify(payload) });
+  },
 
   logout: () => {
     localStorage.removeItem('user');

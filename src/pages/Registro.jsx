@@ -39,7 +39,7 @@ export const Registro = () => {
 
         try {
             // 2. Petición POST a tu Backend usando el servicio
-            const data = await authService.registro(formData.email, formData.password, formData.tipoUsuario);
+            const data = await authService.registro(formData);
 
             // 3. Manejo de la respuesta
             alert('¡Registro exitoso! Ya puedes iniciar sesión.');
