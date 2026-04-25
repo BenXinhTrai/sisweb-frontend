@@ -64,7 +64,20 @@ export const Registro = () => {
                     <p>Complete sus datos para solicitar acceso</p>
                 </header>
 
-                {error && <div className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}>{error}</div>}
+                {error && (
+                    <div className="error-message" style={{ 
+                        backgroundColor: '#ffebee', 
+                        color: '#c62828', 
+                        padding: '12px', 
+                        borderRadius: '6px', 
+                        border: '1px solid #ef5350',
+                        textAlign: 'center', 
+                        marginBottom: '1rem',
+                        fontWeight: 'bold'
+                    }}>
+                        ⚠️ {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="registro-form">
                     <div className="select-group">
