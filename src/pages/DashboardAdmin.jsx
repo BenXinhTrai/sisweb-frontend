@@ -8,8 +8,18 @@ import { apiFetch } from '../services/api';
 import './Dashboard.css';
 
 export const DashboardAdmin = () => {
+    const [user, setUser] = useState(() => {
+        try {
+            const stored = localStorage.getItem('user');
+            if (!stored || stored === 'undefined') return null;
+            return JSON.parse(stored);
+        } catch (e) {
+            console.error("Error al leer sesión en Admin:", e);
+            return null;
+        }
+    });
+
     const [vistaActiva, setVistaActiva] = useState('inicio');
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
     const [isLoading, setIsLoading] = useState(false);
 
     // Definición de las opciones del menú lateral

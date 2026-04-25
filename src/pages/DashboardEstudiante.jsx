@@ -10,6 +10,17 @@ import { descargarCertificadoPDF } from '../utils/generarCertificado';
 import './Dashboard.css';
 
 export const DashboardEstudiante = () => {
+    const [user, setUser] = useState(() => {
+        try {
+            const stored = localStorage.getItem('user');
+            if (!stored || stored === 'undefined') return null;
+            return JSON.parse(stored);
+        } catch (e) {
+            console.error("Error al leer sesión en Estudiante:", e);
+            return null;
+        }
+    });
+
     // Estado para la navegación lateral
     const [vistaActiva, setVistaActiva] = useState('inicio');
 
@@ -22,9 +33,6 @@ export const DashboardEstudiante = () => {
     const [modalInscribir, setModalInscribir] = useState({ isOpen: false, seminarioId: null, seminarioNombre: '' });
     const [modalExito, setModalExito] = useState({ isOpen: false, mensaje: '' });
     const [modalError, setModalError] = useState({ isOpen: false, mensaje: '' });
-
-    // Acceso al usuario logueado
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
     const opcionesMenu = [
         { id: 'inicio', texto: 'Mi Dashboard' },
