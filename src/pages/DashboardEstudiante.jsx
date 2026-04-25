@@ -318,82 +318,88 @@ export const DashboardEstudiante = () => {
                 <>
                     <header className="dashboard-header">
                         <h1>Mi Perfil</h1>
-                        <p>Gestione su información personal básica</p>
+                        <p>Gestione su información personal y seguridad de la cuenta</p>
                     </header>
-                    <div style={{ maxWidth: '600px', backgroundColor: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-                        <form onSubmit={handleUpdatePerfil}>
-                            <InputText
-                                id="perfil-nombre"
-                                label="Nombre Completo"
-                                name="nombre"
-                                value={perfilForm.nombre}
-                                onChange={(e) => setPerfilForm({...perfilForm, nombre: e.target.value})}
-                                required
-                            />
-                            <InputText
-                                id="perfil-documento"
-                                label="Documento de Identidad (C.C.)"
-                                name="documento"
-                                value={perfilForm.documento}
-                                onChange={(e) => setPerfilForm({...perfilForm, documento: e.target.value})}
-                                required
-                            />
-                            <InputText
-                                id="perfil-telefono"
-                                label="Número Celular / Teléfono"
-                                name="telefono"
-                                value={perfilForm.telefono}
-                                onChange={(e) => setPerfilForm({...perfilForm, telefono: e.target.value})}
-                            />
-                            <div style={{ marginTop: '1rem', color: '#666', fontSize: '0.85rem' }}>
-                                <p><strong>Correo Institucional:</strong> {user?.email}</p>
-                                <p style={{ marginTop: '0.3rem' }}>El correo institucional no puede ser modificado por seguridad.</p>
-                            </div>
-                            <div style={{ marginTop: '2rem' }}>
-                                <Button type="submit" variant="primary" disabled={isLoading}>
-                                    {isLoading ? 'Guardando...' : 'Guardar Cambios'}
-                                </Button>
-                            </div>
-                        </form>
-                    </div>
+                    
+                    <div className="profile-container">
+                        {/* Caja 1: Datos Personales */}
+                        <div className="profile-card">
+                            <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#1565C0' }}>Información Personal</h2>
+                            <form onSubmit={handleUpdatePerfil}>
+                                <InputText
+                                    id="perfil-nombre"
+                                    label="Nombre Completo"
+                                    name="nombre"
+                                    value={perfilForm.nombre}
+                                    onChange={(e) => setPerfilForm({...perfilForm, nombre: e.target.value})}
+                                    required
+                                />
+                                <InputText
+                                    id="perfil-documento"
+                                    label="Documento de Identidad (C.C.)"
+                                    name="documento"
+                                    value={perfilForm.documento}
+                                    onChange={(e) => setPerfilForm({...perfilForm, documento: e.target.value})}
+                                    required
+                                />
+                                <InputText
+                                    id="perfil-telefono"
+                                    label="Número Celular / Teléfono"
+                                    name="telefono"
+                                    value={perfilForm.telefono}
+                                    onChange={(e) => setPerfilForm({...perfilForm, telefono: e.target.value})}
+                                />
+                                <div style={{ marginTop: '1rem', color: '#666', fontSize: '0.85rem' }}>
+                                    <p><strong>Correo Institucional:</strong> {user?.email}</p>
+                                    <p style={{ marginTop: '0.3rem' }}>El correo institucional no puede ser modificado.</p>
+                                </div>
+                                <div style={{ marginTop: '2rem' }}>
+                                    <Button type="submit" variant="primary" disabled={isLoading}>
+                                        {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
 
-                    <div style={{ maxWidth: '600px', backgroundColor: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '2rem' }}>
-                        <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#1565C0' }}>Seguridad de la Cuenta</h2>
-                        <form onSubmit={handleUpdatePassword}>
-                            <InputText
-                                id="current-pass"
-                                label="Contraseña Actual"
-                                name="currentPassword"
-                                type="password"
-                                value={passwordForm.currentPassword}
-                                onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                                required
-                            />
-                            <InputText
-                                id="new-pass"
-                                label="Nueva Contraseña"
-                                name="newPassword"
-                                type="password"
-                                value={passwordForm.newPassword}
-                                onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                                placeholder="Mínimo 6 caracteres"
-                                required
-                            />
-                            <InputText
-                                id="confirm-pass"
-                                label="Confirmar Nueva Contraseña"
-                                name="confirmPassword"
-                                type="password"
-                                value={passwordForm.confirmPassword}
-                                onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                                required
-                            />
-                            <div style={{ marginTop: '2rem' }}>
-                                <Button type="submit" variant="secondary" disabled={isLoading}>
-                                    {isLoading ? 'Actualizando...' : 'Cambiar Contraseña'}
-                                </Button>
-                            </div>
-                        </form>
+                        {/* Caja 2: Seguridad */}
+                        <div className="profile-card">
+                            <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#1565C0' }}>Seguridad de la Cuenta</h2>
+                            <form onSubmit={handleUpdatePassword}>
+                                <InputText
+                                    id="current-pass"
+                                    label="Contraseña Actual"
+                                    name="currentPassword"
+                                    type="password"
+                                    value={passwordForm.currentPassword}
+                                    onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                                    required
+                                />
+                                <InputText
+                                    id="new-pass"
+                                    label="Nueva Contraseña"
+                                    name="newPassword"
+                                    type="password"
+                                    value={passwordForm.newPassword}
+                                    onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                                    placeholder="Mínimo 6 caracteres"
+                                    required
+                                />
+                                <InputText
+                                    id="confirm-pass"
+                                    label="Confirmar Nueva Contraseña"
+                                    name="confirmPassword"
+                                    type="password"
+                                    value={passwordForm.confirmPassword}
+                                    onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                                    required
+                                />
+                                <div style={{ marginTop: '2rem' }}>
+                                    <Button type="submit" variant="secondary" disabled={isLoading}>
+                                        {isLoading ? 'Actualizando...' : 'Cambiar Contraseña'}
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </>
             );
