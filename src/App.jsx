@@ -17,6 +17,7 @@ const PrivateRoute = ({ children, rolRequerido }) => {
 import { Login } from './pages/Login';
 import { Registro } from './pages/Registro';
 import { RecuperarPassword } from './pages/RecuperarPassword';
+import { RestablecerPassword } from './pages/RestablecerPassword';
 import { DashboardAdmin } from './pages/DashboardAdmin';
 import { DashboardEstudiante } from './pages/DashboardEstudiante';
 import { DashboardCoordinador } from './pages/DashboardCoordinador';
@@ -32,6 +33,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/recuperar-password" element={<RecuperarPassword />} />
+        <Route path="/restablecer-password" element={<RestablecerPassword />} />
 
         {/* Rutas Privadas (Dashboards) */}
         <Route path="/dashboard-administrador" element={

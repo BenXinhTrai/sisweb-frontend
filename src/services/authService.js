@@ -10,6 +10,12 @@ export const authService = {
     return apiFetch('/registro', { method: 'POST', body: JSON.stringify(payload) });
   },
 
+  solicitarRecuperacion: (email) =>
+    apiFetch('/olvide-password', { method: 'POST', body: JSON.stringify({ email }) }),
+
+  resetPassword: (token, newPassword) =>
+    apiFetch('/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) }),
+
   logout: () => {
     localStorage.removeItem('user');
     window.location.href = '/login';
