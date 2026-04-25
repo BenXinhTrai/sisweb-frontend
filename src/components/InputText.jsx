@@ -23,7 +23,8 @@ export const InputText = ({
     onChange,
     placeholder = '',
     type = 'text',
-    error = ''
+    error = '',
+    ...props
 }) => {
     return (
         <div className="input-group">
@@ -38,6 +39,7 @@ export const InputText = ({
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
+                {...props}
                 // Si existe un error, se añade una clase específica para el borde rojo
                 className={`input-control ${error ? 'input-error' : ''}`}
                 // Atributos de accesibilidad para indicar que el campo tiene un error

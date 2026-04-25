@@ -24,6 +24,13 @@ export const DashboardEstudiante = () => {
     // Acceso al usuario logueado
     const user = JSON.parse(localStorage.getItem('user'));
 
+    // Estado para el formulario de perfil
+    const [perfilForm, setPerfilForm] = useState({
+        nombre: user?.nombre || '',
+        documento: user?.documento || '',
+        telefono: user?.telefono || ''
+    });
+
     const opcionesMenu = [
         { id: 'inicio', texto: 'Mi Dashboard' },
         { id: 'catalogo', texto: 'Catálogo de Seminarios' },
@@ -83,6 +90,30 @@ export const DashboardEstudiante = () => {
             setModalExito({ isOpen: true, mensaje: '¡Inscripción exitosa! Tu cupo ha sido reservado y en minutos llegará un correo a tu bandeja de entrada.' });
         } catch (error) {
             setModalError({ isOpen: true, mensaje: error.message || 'No se pudo completar la inscripción.' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleUpdatePerfil = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const res = await apiFetch(`/usuarios/${user.id_usuario}`, {
+                method: 'PUT',
+                body: JSON.stringify(perfilForm)
+            });
+            
+            // Actualizar localStorage para que los cambios se vean en toda la app
+            const updatedUser = { ...user, ...perfilForm };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            
+            setModalExito({ 
+                isOpen: true, 
+                mensaje: res.mensaje || 'Información de perfil actualizada exitosamente.' 
+            });
+        } catch (error) {
+            setModalError({ isOpen: true, mensaje: error.message || 'Error al actualizar perfil' });
         } finally {
             setIsLoading(false);
         }
@@ -235,6 +266,53 @@ export const DashboardEstudiante = () => {
                             </Card>
                         ))}
                     </section>
+                </>
+            );
+        }
+
+        if (vistaActiva === 'perfil') {
+            return (
+                <>
+                    <header className="dashboard-header">
+                        <h1>Mi Perfil</h1>
+                        <p>Gestione su información personal básica</p>
+                    </header>
+                    <div style={{ maxWidth: '600px', backgroundColor: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                        <form onSubmit={handleUpdatePerfil}>
+                            <InputText
+                                id="perfil-nombre"
+                                label="Nombre Completo"
+                                name="nombre"
+                                value={perfilForm.nombre}
+                                onChange={(e) => setPerfilForm({...perfilForm, nombre: e.target.value})}
+                                required
+                            />
+                            <InputText
+                                id="perfil-documento"
+                                label="Documento de Identidad (C.C.)"
+                                name="documento"
+                                value={perfilForm.documento}
+                                onChange={(e) => setPerfilForm({...perfilForm, documento: e.target.value})}
+                                required
+                            />
+                            <InputText
+                                id="perfil-telefono"
+                                label="Número Celular / Teléfono"
+                                name="telefono"
+                                value={perfilForm.telefono}
+                                onChange={(e) => setPerfilForm({...perfilForm, telefono: e.target.value})}
+                            />
+                            <div style={{ marginTop: '1rem', color: '#666', fontSize: '0.85rem' }}>
+                                <p><strong>Correo Institucional:</strong> {user?.email}</p>
+                                <p style={{ marginTop: '0.3rem' }}>El correo institucional no puede ser modificado por seguridad.</p>
+                            </div>
+                            <div style={{ marginTop: '2rem' }}>
+                                <Button type="submit" variant="primary" disabled={isLoading}>
+                                    {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
                 </>
             );
         }
