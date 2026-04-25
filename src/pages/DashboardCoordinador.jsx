@@ -25,6 +25,10 @@ export const DashboardCoordinador = () => {
         window.location.href = '/login';
     };
 
+    const handleGestionarSeminario = () => {
+        alert('Abriendo herramientas de gestión de recursos y ponentes...');
+    };
+
     const renderVista = () => {
         if (vistaActiva === 'perfil') {
             return <ProfileView user={user} onUserUpdate={(updated) => setUser(updated)} />;
@@ -94,7 +98,7 @@ export const DashboardCoordinador = () => {
     return (
         <div className="dashboard-layout">
             <Sidebar
-                tituloRol={user ? user.rol.replace('coordinador', 'Coord. Seminarios').toUpperCase() : "COORDINADOR"}
+                tituloRol={user?.rol === 'coordinador' ? "COORDINADOR DE SEMINARIOS" : (user?.rol?.toUpperCase() || "COORDINADOR")}
                 opciones={opcionesMenu}
                 onCerrarSesion={handleCerrarSesion}
                 onNavegar={(idVista) => setVistaActiva(idVista)}

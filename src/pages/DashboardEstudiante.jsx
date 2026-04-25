@@ -125,8 +125,8 @@ export const DashboardEstudiante = () => {
                                     <p style={{ margin: '0.5rem 0', height: '40px', overflow: 'hidden' }}>{sem.descripcion}</p>
                                 </div>
                                 <div>
-                                    <Button 
-                                        variant="primary" 
+                                    <Button
+                                        variant="primary"
                                         disabled={isLoading || sem.cupos_disponibles <= 0}
                                         onClick={() => intentarInscripcion(sem.id_seminario, sem.nombre)}
                                     >
@@ -222,11 +222,11 @@ export const DashboardEstudiante = () => {
                                     <p style={{ margin: '0.5rem 0' }}><strong>Carga Horaria:</strong> {cert.intensidad}</p>
                                 </div>
                                 <div>
-                                    <Button 
-                                        variant="primary" 
+                                    <Button
+                                        variant="primary"
                                         onClick={() => descargarCertificadoPDF(
-                                            user?.nombre || 'Estudiante', 
-                                            cert.nombre, 
+                                            user?.nombre || 'Estudiante',
+                                            cert.nombre,
                                             new Date(cert.fecha).toLocaleDateString(),
                                             user?.documento || ''
                                         )}
@@ -243,9 +243,9 @@ export const DashboardEstudiante = () => {
 
         if (vistaActiva === 'perfil') {
             return (
-                <ProfileView 
-                    user={user} 
-                    onUserUpdate={(updatedUser) => setUser(updatedUser)} 
+                <ProfileView
+                    user={user}
+                    onUserUpdate={(updatedUser) => setUser(updatedUser)}
                 />
             );
         }
@@ -261,7 +261,7 @@ export const DashboardEstudiante = () => {
     return (
         <div className="dashboard-layout">
             <Sidebar
-                tituloRol={user ? user.rol.toUpperCase() : "PARTICIPANTE"}
+                tituloRol={user?.rol?.toUpperCase() || "PARTICIPANTE"}
                 opciones={opcionesMenu}
                 onCerrarSesion={handleCerrarSesion}
                 onNavegar={(idVista) => setVistaActiva(idVista)}

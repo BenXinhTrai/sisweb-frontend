@@ -25,6 +25,10 @@ export const DashboardAdmin = () => {
         window.location.href = '/login';
     };
 
+    const handleCrearUsuario = () => {
+        alert('Abriendo modal para crear nuevo usuario...');
+    };
+
     const renderVista = () => {
         if (vistaActiva === 'perfil') {
             return <ProfileView user={user} onUserUpdate={(updated) => setUser(updated)} />;
@@ -104,7 +108,7 @@ export const DashboardAdmin = () => {
     return (
         <div className="dashboard-layout">
             <Sidebar
-                tituloRol={user ? user.rol.toUpperCase() : "ADMIN"}
+                tituloRol={user?.rol?.toUpperCase() || "ADMIN"}
                 opciones={opcionesMenu}
                 onCerrarSesion={handleCerrarSesion}
                 onNavegar={(idVista) => setVistaActiva(idVista)}
