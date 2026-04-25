@@ -4,6 +4,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
 import { apiFetch } from '../services/api';
+import { descargarCertificadoPDF } from '../utils/generarCertificado';
 import './Dashboard.css';
 
 export const DashboardEstudiante = () => {
@@ -189,6 +190,46 @@ export const DashboardEstudiante = () => {
                             </ul>
                         )}
                     </div>
+                </>
+            );
+        }
+
+        if (vistaActiva === 'certificados') {
+            // Certificado de ejemplo universal solicitado por el usuario
+            const certificadosDemo = [
+                {
+                    id: 'SW-CERT-DEMO',
+                    nombre: 'Inducción Institucional SISWEB',
+                    fecha: '2026-02-10',
+                    intensidad: '40 horas'
+                }
+            ];
+
+            return (
+                <>
+                    <header className="dashboard-header">
+                        <h1>Mis Certificados</h1>
+                        <p>Consulte y descargue sus certificaciones logradas en el sistema.</p>
+                    </header>
+                    <section className="stats-grid">
+                        {certificadosDemo.map(cert => (
+                            <Card key={cert.id} title={cert.nombre}>
+                                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '1rem' }}>
+                                    <p style={{ margin: '0.5rem 0' }}><strong>Estado:</strong> Aprobado</p>
+                                    <p style={{ margin: '0.5rem 0' }}><strong>Finalizado el:</strong> {new Date(cert.fecha).toLocaleDateString()}</p>
+                                    <p style={{ margin: '0.5rem 0' }}><strong>Carga Horaria:</strong> {cert.intensidad}</p>
+                                </div>
+                                <div>
+                                    <Button 
+                                        variant="primary" 
+                                        onClick={() => descargarCertificadoPDF(user?.nombre || 'Estudiante', cert.nombre, new Date(cert.fecha).toLocaleDateString())}
+                                    >
+                                        Descargar PDF
+                                    </Button>
+                                </div>
+                            </Card>
+                        ))}
+                    </section>
                 </>
             );
         }
