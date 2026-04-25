@@ -6,6 +6,8 @@ import { Modal } from '../components/Modal';
 import { ProfileView } from '../components/ProfileView';
 import { InputText } from '../components/InputText';
 import { apiFetch } from '../services/api';
+// Importamos recharts para gráficos avanzados
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import './Dashboard.css';
 
 export const DashboardCoordinador = () => {
@@ -27,6 +29,7 @@ export const DashboardCoordinador = () => {
     const [seminarios, setSeminarios] = useState([]);
     const [coordinadores, setCoordinadores] = useState([]);
     const [inscritosEnGestion, setInscritosEnGestion] = useState([]);
+    const [notasTemporales, setNotasTemporales] = useState({});
 
     // Estados de Modales
     const [modalExito, setModalExito] = useState({ isOpen: false, mensaje: '' });
@@ -37,7 +40,7 @@ export const DashboardCoordinador = () => {
     const [formSeminario, setFormSeminario] = useState({ codigo: '', nombre: '', descripcion: '', fecha: '' });
 
     // Modal de Gestión
-    const [modalGestionar, setModalGestionar] = useState({ isOpen: false, seminarioNombre: '' });
+    const [modalGestionar, setModalGestionar] = useState({ isOpen: false, seminarioNombre: '', idSeminario: null });
 
     const opcionesMenu = [
         { id: 'inicio', texto: 'Resumen' },
@@ -45,6 +48,8 @@ export const DashboardCoordinador = () => {
         { id: 'perfil', texto: 'Mi Perfil' },
         { id: 'reportes', texto: 'Reportes' }
     ];
+
+    const COLORES = ['#1565C0', '#42A5F5', '#1E88E5', '#90CAF9', '#0D47A1', '#64B5F6'];
 
     useEffect(() => {
         const fetchDatos = async () => {
@@ -71,7 +76,6 @@ export const DashboardCoordinador = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            // Buscamos el id_coordinador correlacionado con el usuario actual
             const coord = coordinadores.find(c => c.id_usuario === user?.id_usuario);
             const id_coordinador = coord ? coord.id_coordinador : (coordinadores.length > 0 ? coordinadores[0].id_coordinador : 1);
 
@@ -80,7 +84,6 @@ export const DashboardCoordinador = () => {
                 body: JSON.stringify({ ...formSeminario, id_coordinador })
             });
 
-            // Recargar seminarios
             const dataSeminarios = await apiFetch('/seminarios');
             setSeminarios(Array.isArray(dataSeminarios) ? dataSeminarios : []);
             
@@ -99,8 +102,16 @@ export const DashboardCoordinador = () => {
         setIsLoading(true);
         try {
             const dataInscritos = await apiFetch(`/seminario-inscritos/${id_seminario}`);
-            setInscritosEnGestion(Array.isArray(dataInscritos) ? dataInscritos : []);
-            setModalGestionar({ isOpen: true, seminarioNombre: nombre });
+            const arrayInscritos = Array.isArray(dataInscritos) ? dataInscritos : [];
+            
+            const notasInit = {};
+            arrayInscritos.forEach(ins => {
+                notasInit[ins.id_inscripcion] = ins.calificacion !== null ? ins.calificacion : '';
+            });
+            
+            setNotasTemporales(notasInit);
+            setInscritosEnGestion(arrayInscritos);
+            setModalGestionar({ isOpen: true, seminarioNombre: nombre, idSeminario: id_seminario });
         } catch (error) {
             setModalError({ isOpen: true, mensaje: 'Error al obtener la lista de estudiantes inscritos.' });
         } finally {
@@ -108,9 +119,41 @@ export const DashboardCoordinador = () => {
         }
     };
 
-    const simularCalificacion = (nombreEstudiante) => {
-        alert(`Has enviado la calificación aprobatoria simulada al estudiante: ${nombreEstudiante}. ¡Registro exitoso!`);
+    // Subir Calificacion a la API
+    const handleSubirCalificacion = async (id_inscripcion) => {
+        setIsLoading(true);
+        try {
+            const nota = parseFloat(notasTemporales[id_inscripcion]);
+            if (isNaN(nota) || nota < 0 || nota > 5.0) {
+                setModalError({ isOpen: true, mensaje: 'La calificación debe ser un número entre 0.0 y 5.0' });
+                setIsLoading(false);
+                return;
+            }
+
+            const res = await apiFetch(`/inscripciones/${id_inscripcion}/calificar`, {
+                method: 'PUT',
+                body: JSON.stringify({ calificacion: nota })
+            });
+
+            // Actualizar la lista local
+            setInscritosEnGestion(prev => prev.map(ins => 
+                ins.id_inscripcion === id_inscripcion ? { ...ins, calificacion: nota, estado: res.estado } : ins
+            ));
+
+            alert(`✅ Calificación guardada exitosamente. Nuevo estado: ${res.estado}`);
+        } catch (error) {
+            setModalError({ isOpen: true, mensaje: error.message || 'Error al calificar.' });
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+    // Preparar datos para los reportes
+    const ocupacionData = seminarios.map(s => ({
+        nombre: s.nombre.substring(0, 15) + '...',
+        inscritos: s.cupos_totales - s.cupos_disponibles,
+        disponibles: s.cupos_disponibles
+    }));
 
     const renderVista = () => {
         if (vistaActiva === 'perfil') {
@@ -177,27 +220,26 @@ export const DashboardCoordinador = () => {
             return (
                 <>
                     <header className="dashboard-header">
-                        <h1>Reportes de Rendimiento</h1>
-                        <p>Panel de estadísticas y extracción de datos.</p>
+                        <h1>Reportes Reales de Rendimiento</h1>
+                        <p>Análisis en vivo de los datos registrados en el módulo de seminarios.</p>
                     </header>
-                    <section className="stats-grid">
-                        <Card title="Gráficas y Descargas">
-                            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
-                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
-                                <h3 style={{ color: '#1565C0' }}>Módulo Analítico en Desarrollo</h3>
-                                <p>Estamos integrando los motores de exportación para PDF y Excel. Muy pronto podrás descargar métricas por cada seminario.</p>
-                                <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                                    <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '8px', minWidth: '150px' }}>
-                                        <p style={{ margin: '0 0 5px 0', fontSize: '0.9rem' }}>Total Seminarios</p>
-                                        <strong style={{ fontSize: '1.8rem', color: '#333' }}>{seminarios.length}</strong>
-                                    </div>
-                                    <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '8px', minWidth: '150px' }}>
-                                        <p style={{ margin: '0 0 5px 0', fontSize: '0.9rem' }}>Asistencia Promedio</p>
-                                        <strong style={{ fontSize: '1.8rem', color: '#333' }}>85%</strong>
-                                    </div>
-                                </div>
+                    <section className="stats-grid" style={{ gridTemplateColumns: '1fr', gap: '2rem' }}>
+                        <Card title="Ocupación de Seminarios Activos">
+                            <div style={{ width: '100%', height: 350, marginTop: '1rem' }}>
+                                <ResponsiveContainer>
+                                    <BarChart data={ocupacionData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis dataKey="nombre" angle={-45} textAnchor="end" height={70} tick={{fontSize: 12}} />
+                                        <YAxis />
+                                        <Tooltip cursor={{fill: 'rgba(21, 101, 192, 0.05)'}} />
+                                        <Legend verticalAlign="top" height={36}/>
+                                        <Bar dataKey="inscritos" name="Inscritos" stackId="a" fill="#1565C0" />
+                                        <Bar dataKey="disponibles" name="Cupos Libres" stackId="a" fill="#90CAF9" />
+                                    </BarChart>
+                                </ResponsiveContainer>
                             </div>
                         </Card>
+
                     </section>
                 </>
             );
@@ -215,15 +257,15 @@ export const DashboardCoordinador = () => {
 
                 <section className="stats-grid">
                     <Card>
-                        <p className="stat-label">Seminarios Activos</p>
+                        <p className="stat-label">Seminarios Impartidos</p>
                         <p className="stat-number">{seminarios.length}</p>
                     </Card>
                     <Card>
-                        <p className="stat-label">Evaluaciones Pendientes</p>
-                        <p className="stat-number">Aprox. {seminarios.length * 3}</p>
+                        <p className="stat-label">Estudiantes Capcitados</p>
+                        <p className="stat-number">{seminarios.reduce((acc, curr) => acc + (curr.cupos_totales - curr.cupos_disponibles), 0)}</p>
                     </Card>
                     <Card>
-                        <p className="stat-label">Aulas / Recursos Asignados</p>
+                        <p className="stat-label">Aulas Asignadas</p>
                         <p className="stat-number">{seminarios.length}</p>
                     </Card>
                 </section>
@@ -262,7 +304,7 @@ export const DashboardCoordinador = () => {
                         />
                     </div>
 
-                    <InputText id="sem-fecha" label="Fecha de Inicio" name="fecha" type="date" value={formSeminario.fecha} onChange={(e) => setFormSeminario({...formSeminario, fecha: e.target.value})} required />
+                    <InputText id="sem-fecha" label="Fecha Programada" name="fecha" type="date" value={formSeminario.fecha} onChange={(e) => setFormSeminario({...formSeminario, fecha: e.target.value})} required />
                     
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem' }}>
                         <Button type="button" variant="secondary" onClick={() => setModalCrearSeminario(false)} disabled={isLoading}>Cancelar</Button>
@@ -274,7 +316,7 @@ export const DashboardCoordinador = () => {
             {/* Modal para Gestionar Inscripciones */}
             <Modal isOpen={modalGestionar.isOpen} onClose={() => setModalGestionar({ isOpen: false, seminarioNombre: '' })} title={`Inscritos en: ${modalGestionar.seminarioNombre}`}>
                 <div style={{ padding: '0.5rem', maxHeight: '60vh', overflowY: 'auto' }}>
-                    <p style={{ color: '#555', marginBottom: '1rem', fontSize: '0.9rem' }}>A continuación se muestra el listado de todos los participantes matriculados.</p>
+                    <p style={{ color: '#555', marginBottom: '1rem', fontSize: '0.9rem' }}>Ingresa la nota (0.0 a 5.0) y haz clic en "Subir" para guardar la valoración.</p>
                     
                     {inscritosEnGestion.length === 0 ? (
                         <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
@@ -285,20 +327,35 @@ export const DashboardCoordinador = () => {
                             <thead>
                                 <tr>
                                     <th>Cédula</th>
-                                    <th>Nombre del Estudiante</th>
-                                    <th>Correo</th>
+                                    <th>Estudiante</th>
+                                    <th>Estado</th>
                                     <th>Calificación</th>
+                                    <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {inscritosEnGestion.map((ins, idx) => (
-                                    <tr key={idx}>
+                                {inscritosEnGestion.map((ins) => (
+                                    <tr key={ins.id_inscripcion}>
                                         <td>{ins.matricula || 'N/A'}</td>
                                         <td><strong>{ins.nombre || 'Desconocido'}</strong></td>
-                                        <td>{ins.correo}</td>
+                                        <td style={{ color: ins.estado === 'Aprobado' ? '#388E3C' : (ins.estado === 'Reprobado' ? '#D32F2F' : '#F57C00'), fontWeight: 'bold' }}>
+                                            {ins.estado}
+                                        </td>
+                                        <td style={{ width: '80px' }}>
+                                            <input 
+                                                type="number" 
+                                                step="0.1" 
+                                                min="0" 
+                                                max="5"
+                                                className="input-control" 
+                                                style={{ padding: '0.3rem', width: '100%', minWidth: '60px' }}
+                                                value={notasTemporales[ins.id_inscripcion] !== undefined ? notasTemporales[ins.id_inscripcion] : ''}
+                                                onChange={(e) => setNotasTemporales({...notasTemporales, [ins.id_inscripcion]: e.target.value})}
+                                            />
+                                        </td>
                                         <td>
-                                            <Button variant="primary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }} onClick={() => simularCalificacion(ins.nombre)}>
-                                                Aprobar ✅
+                                            <Button variant="primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={() => handleSubirCalificacion(ins.id_inscripcion)} disabled={isLoading}>
+                                                Subir ☁️
                                             </Button>
                                         </td>
                                     </tr>
