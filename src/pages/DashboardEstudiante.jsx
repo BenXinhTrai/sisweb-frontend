@@ -9,12 +9,12 @@ import './Dashboard.css';
 export const DashboardEstudiante = () => {
     // Estado para la navegación lateral
     const [vistaActiva, setVistaActiva] = useState('inicio');
-    
+
     // Estados para la carga de datos y UI
     const [seminarios, setSeminarios] = useState([]);
     const [misInscripciones, setMisInscripciones] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     // Estados para los Modales
     const [modalInscribir, setModalInscribir] = useState({ isOpen: false, seminarioId: null, seminarioNombre: '' });
     const [modalExito, setModalExito] = useState({ isOpen: false, mensaje: '' });
@@ -38,7 +38,7 @@ export const DashboardEstudiante = () => {
                 // Traer seminarios
                 const dataSeminarios = await apiFetch('/seminarios');
                 setSeminarios(dataSeminarios);
-                
+
                 // Traer inscripciones (Requiere endpoint mis-inscripciones que ya existe)
                 if (user && user.id_usuario) {
                     const dataInscripciones = await apiFetch(`/mis-inscripciones/${user.id_usuario}`);
@@ -78,7 +78,7 @@ export const DashboardEstudiante = () => {
 
             // Refrescar lista visual restando un cupo artificialmente para UX rapido
             setSeminarios(prev => prev.map(s => s.id_seminario === id_seminario ? { ...s, cupos_disponibles: s.cupos_disponibles - 1 } : s));
-            
+
             setModalExito({ isOpen: true, mensaje: '¡Inscripción exitosa! Tu cupo ha sido reservado y en minutos llegará un correo a tu bandeja de entrada.' });
         } catch (error) {
             setModalError({ isOpen: true, mensaje: error.message || 'No se pudo completar la inscripción.' });
@@ -109,6 +109,30 @@ export const DashboardEstudiante = () => {
                             <p className="stat-number">0h</p>
                         </Card>
                     </section>
+
+                    <h2 style={{ marginTop: '3rem', marginBottom: '1rem', color: '#1565C0' }}>Próximos Seminarios Disponibles</h2>
+                    <section className="stats-grid">
+                        {seminarios.length === 0 ? <p>No hay seminarios disponibles por el momento.</p> : null}
+                        {seminarios.map(sem => (
+                            <Card key={sem.id_seminario} title={sem.nombre}>
+                                <div style={{ fontSize: '0.9rem', color: '#555', marginBottom: '1rem' }}>
+                                    <p style={{ margin: '0.5rem 0' }}><strong>Código:</strong> {sem.codigo}</p>
+                                    <p style={{ margin: '0.5rem 0' }}><strong>Fecha:</strong> {new Date(sem.fecha).toLocaleDateString()}</p>
+                                    <p style={{ margin: '0.5rem 0' }}><strong>Cupos Libres:</strong> {sem.cupos_disponibles}</p>
+                                    <p style={{ margin: '0.5rem 0', height: '40px', overflow: 'hidden' }}>{sem.descripcion}</p>
+                                </div>
+                                <div>
+                                    <Button 
+                                        variant="primary" 
+                                        disabled={isLoading || sem.cupos_disponibles <= 0}
+                                        onClick={() => intentarInscripcion(sem.id_seminario, sem.nombre)}
+                                    >
+                                        {sem.cupos_disponibles <= 0 ? 'Sin Cupos' : 'Inscribirse'}
+                                    </Button>
+                                </div>
+                            </Card>
+                        ))}
+                    </section>
                 </>
             );
         }
@@ -131,8 +155,8 @@ export const DashboardEstudiante = () => {
                                     <p style={{ margin: '0.5rem 0', height: '40px', overflow: 'hidden' }}>{sem.descripcion}</p>
                                 </div>
                                 <div>
-                                    <Button 
-                                        variant="primary" 
+                                    <Button
+                                        variant="primary"
                                         disabled={isLoading || sem.cupos_disponibles <= 0}
                                         onClick={() => intentarInscripcion(sem.id_seminario, sem.nombre)}
                                     >
@@ -198,13 +222,13 @@ export const DashboardEstudiante = () => {
             </main>
 
             {/* Modales Desplegables */}
-            <Modal 
-                isOpen={modalInscribir.isOpen} 
+            <Modal
+                isOpen={modalInscribir.isOpen}
                 onClose={() => setModalInscribir({ isOpen: false, seminarioId: null, seminarioNombre: '' })}
                 title="Confirmar Inscripción"
             >
                 <div style={{ textAlign: 'center' }}>
-                    <p>Estás a un paso de inscribirte en el seminario: <br/><strong>{modalInscribir.seminarioNombre}</strong></p>
+                    <p>Estás a un paso de inscribirte en el seminario: <br /><strong>{modalInscribir.seminarioNombre}</strong></p>
                     <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>Se enviará automáticamente un correo a tu cuenta institucional.</p>
                     <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                         <Button variant="primary" onClick={confirmarInscripcion} disabled={isLoading}>
@@ -217,8 +241,8 @@ export const DashboardEstudiante = () => {
                 </div>
             </Modal>
 
-            <Modal 
-                isOpen={modalExito.isOpen} 
+            <Modal
+                isOpen={modalExito.isOpen}
                 onClose={() => setModalExito({ isOpen: false, mensaje: '' })}
                 title="¡Inscripción Confirmada!"
             >
@@ -232,8 +256,8 @@ export const DashboardEstudiante = () => {
                 </div>
             </Modal>
 
-            <Modal 
-                isOpen={modalError.isOpen} 
+            <Modal
+                isOpen={modalError.isOpen}
                 onClose={() => setModalError({ isOpen: false, mensaje: '' })}
                 title="Aviso del Sistema"
             >
