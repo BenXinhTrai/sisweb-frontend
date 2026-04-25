@@ -394,7 +394,7 @@ export const DashboardEstudiante = () => {
                                     required
                                 />
                                 <div style={{ marginTop: '2rem' }}>
-                                    <Button type="submit" variant="secondary" disabled={isLoading}>
+                                    <Button type="submit" variant="primary" disabled={isLoading}>
                                         {isLoading ? 'Actualizando...' : 'Cambiar Contraseña'}
                                     </Button>
                                 </div>
