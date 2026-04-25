@@ -222,7 +222,12 @@ export const DashboardEstudiante = () => {
                                 <div>
                                     <Button 
                                         variant="primary" 
-                                        onClick={() => descargarCertificadoPDF(user?.nombre || 'Estudiante', cert.nombre, new Date(cert.fecha).toLocaleDateString())}
+                                        onClick={() => descargarCertificadoPDF(
+                                            user?.nombre || 'Estudiante', 
+                                            cert.nombre, 
+                                            new Date(cert.fecha).toLocaleDateString(),
+                                            user?.documento || ''
+                                        )}
                                     >
                                         Descargar PDF
                                     </Button>

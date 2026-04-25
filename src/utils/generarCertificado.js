@@ -6,8 +6,9 @@ import jsPDF from 'jspdf';
  * @param {string} nombreParticipante - Nombre completo del estudiante.
  * @param {string} nombreSeminario - Nombre del seminario cursado.
  * @param {string} fechaTexto - Fecha de finalización (ej: "25 de Abril de 2026").
+ * @param {string} documento - Documento de identidad del estudiante.
  */
-export const descargarCertificadoPDF = (nombreParticipante, nombreSeminario, fechaTexto) => {
+export const descargarCertificadoPDF = (nombreParticipante, nombreSeminario, fechaTexto, documento) => {
     // Inicializar el PDF en formato horizontal (landscape) y tamaño A4 ('a4')
     const doc = new jsPDF('landscape', 'mm', 'a4');
 
@@ -54,6 +55,14 @@ export const descargarCertificadoPDF = (nombreParticipante, nombreSeminario, fec
     doc.setTextColor(21, 101, 192); // Azul corporativo
     doc.setFont("helvetica", "bolditalic");
     doc.text(nombreParticipante.toUpperCase(), pageWidth / 2, 115, { align: 'center' });
+    
+    // Documento de Identidad (Nuevo)
+    if (documento) {
+        doc.setFontSize(14);
+        doc.setTextColor(100, 100, 100);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Identificado(a) con C.C. No. ${documento}`, pageWidth / 2, 125, { align: 'center' });
+    }
 
     // Razón del Certificado
     doc.setFontSize(16);
