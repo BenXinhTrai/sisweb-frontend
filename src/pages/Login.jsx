@@ -21,6 +21,7 @@ export const Login = () => {
 
     // Estado adicional para manejar mensajes de error en la validación
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     // ========================================================
     // 2. FUNCIONES MANEJADORAS (Handlers)
@@ -41,6 +42,7 @@ export const Login = () => {
         }
 
         setError(''); // Limpiamos errores previos
+        setIsLoading(true);
 
         try {
             // Petición al Backend mediante el servicio centralizado
@@ -50,9 +52,6 @@ export const Login = () => {
             // REQUERIMIENTO SENA: VALIDACIÓN DE MENSAJES EXACTOS
             // =========================================================
             if (data.mensaje === 'autenticación satisfactoria') {
-                // Mostramos el mensaje de éxito requerido
-                alert(data.mensaje);
-
                 // Guardamos el usuario en localStorage para las rutas protegidas
                 localStorage.setItem('user', JSON.stringify(data.usuario));
 
@@ -77,6 +76,7 @@ export const Login = () => {
             console.error("Error de conexión:", error);
             // Mostrar Error explícito atrapado desde el apiFetch
             setError(error.message || 'error en la autenticación');
+            setIsLoading(false); // Solo apagamos el loading si hay error (si es exitoso la página redirige)
         }
     };
 
@@ -117,7 +117,7 @@ export const Login = () => {
                         label="Correo Electrónico"
                         name="email"
                         type="email"
-                        placeholder="ejemplo@univalle.edu.co"
+                        placeholder="ejemplo@sena.edu.co"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)} // Actualiza el estado
                     />
@@ -135,8 +135,8 @@ export const Login = () => {
 
                     {/* Componente Personalizado: Button */}
                     <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center' }}>
-                        <Button type="submit" variant="primary">
-                            Ingresar al Sistema
+                        <Button type="submit" variant="primary" disabled={isLoading}>
+                            {isLoading ? 'Conectando...' : 'Ingresar al Sistema'}
                         </Button>
                     </div>
                 </form>
