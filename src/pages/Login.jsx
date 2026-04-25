@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 // Importamos los componentes base que creamos anteriormente
 import { InputText } from '../components/InputText';
 import { Button } from '../components/Button';
+import { authService } from '../services/authService';
 import './Login.css';
 
 /**
@@ -42,23 +43,18 @@ export const Login = () => {
         setError(''); // Limpiamos errores previos
 
         try {
-            // Petición POST a tu API de Login
-            const response = await fetch('http://localhost:3000/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await response.json();
+            // Petición al Backend mediante el servicio centralizado
+            const data = await authService.login(email, password);
 
             // =========================================================
             // REQUERIMIENTO SENA: VALIDACIÓN DE MENSAJES EXACTOS
             // =========================================================
-            if (response.ok && data.mensaje === 'autenticación satisfactoria') {
+            if (data.mensaje === 'autenticación satisfactoria') {
                 // Mostramos el mensaje de éxito requerido
                 alert(data.mensaje);
+
+                // Guardamos el usuario en localStorage para las rutas protegidas
+                localStorage.setItem('user', JSON.stringify(data.usuario));
 
                 // Extraemos el rol directamente desde la base de datos
                 const rolReal = data.usuario.rol;
@@ -74,12 +70,13 @@ export const Login = () => {
                     window.location.href = '/dashboard-participante'; // Ruta por defecto
                 }
             } else {
-                // Mostramos el mensaje de error exacto requerido por el SENA
+                // Mensaje de error si la respuesta es extraña
                 setError(data.mensaje || 'error en la autenticación');
             }
         } catch (error) {
             console.error("Error de conexión:", error);
-            setError('error en la autenticación'); // Fallback de error requerido
+            // Mostrar Error explícito atrapado desde el apiFetch
+            setError(error.message || 'error en la autenticación');
         }
     };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { InputText } from '../components/InputText';
 import { Button } from '../components/Button';
+import { authService } from '../services/authService';
 import './Registro.css';
 
 /**
@@ -37,32 +38,16 @@ export const Registro = () => {
         }
 
         try {
-            // 2. Petición POST a tu Backend (API)
-            const response = await fetch('http://localhost:3000/api/registro', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                // Enviamos los datos mapeados a lo que espera la base de datos
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
-                    rol: formData.tipoUsuario // Aquí enviamos si es admin, coordinador, etc.
-                })
-            });
-
-            const data = await response.json();
+            // 2. Petición POST a tu Backend usando el servicio
+            const data = await authService.registro(formData.email, formData.password, formData.tipoUsuario);
 
             // 3. Manejo de la respuesta
-            if (response.ok) {
-                alert('¡Registro exitoso! Ya puedes iniciar sesión.');
-                window.location.href = '/login'; // Redirige al login
-            } else {
-                setError(data.error || 'Ocurrió un error al registrar.');
-            }
+            alert('¡Registro exitoso! Ya puedes iniciar sesión.');
+            window.location.href = '/login'; // Redirige al login
         } catch (error) {
             console.error("Error de conexión:", error);
-            setError('Error de conexión con el servidor.');
+            // Mostrar Error explícito del authService
+            setError(error.message || 'Error de conexión con el servidor.');
         }
     };
 
