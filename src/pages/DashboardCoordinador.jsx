@@ -1,40 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { Modal } from '../components/Modal';
+import { ProfileView } from '../components/ProfileView';
+import { apiFetch } from '../services/api';
 import './Dashboard.css';
 
-/**
- * Componente funcional DashboardCoordinador
- * Traducido desde seminarioscordi.html. Permite gestionar seminarios asignados.
- */
 export const DashboardCoordinador = () => {
+    const [vistaActiva, setVistaActiva] = useState('inicio');
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+    const [isLoading, setIsLoading] = useState(false);
+
     // Definición de las opciones del menú lateral
     const opcionesMenu = [
         { id: 'inicio', texto: 'Resumen' },
         { id: 'mis-seminarios', texto: 'Mis Seminarios' },
-        { id: 'crear', texto: 'Crear Seminario' },
-        { id: 'reportes', texto: 'Reportes' },
-        { id: 'perfil', texto: 'Mi Perfil' }
+        { id: 'perfil', texto: 'Mi Perfil' },
+        { id: 'reportes', texto: 'Reportes' }
     ];
 
     const handleCerrarSesion = () => {
+        localStorage.removeItem('user');
         window.location.href = '/login';
     };
 
-    const handleGestionarSeminario = () => {
-        alert('Abriendo herramientas de gestión de recursos y ponentes...');
-    };
+    const renderVista = () => {
+        if (vistaActiva === 'perfil') {
+            return <ProfileView user={user} onUserUpdate={(updated) => setUser(updated)} />;
+        }
 
-    return (
-        <div className="dashboard-layout">
-            <Sidebar
-                tituloRol="Coord. Seminarios"
-                opciones={opcionesMenu}
-                onCerrarSesion={handleCerrarSesion}
-            />
-
-            <main className="dashboard-main">
+        return (
+            <>
                 <header className="dashboard-header">
                     <h1>Gestión de Seminarios</h1>
                 </header>
@@ -90,6 +87,21 @@ export const DashboardCoordinador = () => {
                         </table>
                     </Card>
                 </section>
+            </>
+        );
+    };
+
+    return (
+        <div className="dashboard-layout">
+            <Sidebar
+                tituloRol={user ? user.rol.replace('coordinador', 'Coord. Seminarios').toUpperCase() : "COORDINADOR"}
+                opciones={opcionesMenu}
+                onCerrarSesion={handleCerrarSesion}
+                onNavegar={(idVista) => setVistaActiva(idVista)}
+            />
+
+            <main className="dashboard-main">
+                {renderVista()}
             </main>
         </div>
     );

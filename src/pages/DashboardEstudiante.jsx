@@ -4,6 +4,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
 import { InputText } from '../components/InputText';
+import { ProfileView } from '../components/ProfileView';
 import { apiFetch } from '../services/api';
 import { descargarCertificadoPDF } from '../utils/generarCertificado';
 import './Dashboard.css';
@@ -23,21 +24,7 @@ export const DashboardEstudiante = () => {
     const [modalError, setModalError] = useState({ isOpen: false, mensaje: '' });
 
     // Acceso al usuario logueado
-    const user = JSON.parse(localStorage.getItem('user'));
-
-    // Estado para el formulario de perfil
-    const [perfilForm, setPerfilForm] = useState({
-        nombre: user?.nombre || '',
-        documento: user?.documento || '',
-        telefono: user?.telefono || ''
-    });
-
-    // Estado para el cambio de contraseña
-    const [passwordForm, setPasswordForm] = useState({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-    });
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
     const opcionesMenu = [
         { id: 'inicio', texto: 'Mi Dashboard' },
@@ -98,65 +85,6 @@ export const DashboardEstudiante = () => {
             setModalExito({ isOpen: true, mensaje: '¡Inscripción exitosa! Tu cupo ha sido reservado y en minutos llegará un correo a tu bandeja de entrada.' });
         } catch (error) {
             setModalError({ isOpen: true, mensaje: error.message || 'No se pudo completar la inscripción.' });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleUpdatePerfil = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        try {
-            const res = await apiFetch(`/usuarios/${user.id_usuario}`, {
-                method: 'PUT',
-                body: JSON.stringify(perfilForm)
-            });
-            
-            // Actualizar localStorage para que los cambios se vean en toda la app
-            const updatedUser = { ...user, ...perfilForm };
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-            
-            setModalExito({ 
-                isOpen: true, 
-                mensaje: res.mensaje || 'Información de perfil actualizada exitosamente.' 
-            });
-        } catch (error) {
-            setModalError({ isOpen: true, mensaje: error.message || 'Error al actualizar perfil' });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleUpdatePassword = async (e) => {
-        e.preventDefault();
-
-        // Validaciones básicas de cliente
-        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-            setModalError({ isOpen: true, mensaje: 'Las nuevas contraseñas no coinciden.' });
-            return;
-        }
-
-        if (passwordForm.newPassword.length < 6) {
-            setModalError({ isOpen: true, mensaje: 'La contraseña debe tener al menos 6 caracteres por seguridad.' });
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            const res = await apiFetch('/cambiar-password', {
-                method: 'POST',
-                body: JSON.stringify({
-                    id_usuario: user.id_usuario,
-                    currentPassword: passwordForm.currentPassword,
-                    newPassword: passwordForm.newPassword
-                })
-            });
-
-            // Limpiar formulario y avisar
-            setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-            setModalExito({ isOpen: true, mensaje: res.mensaje || 'Tu contraseña ha sido actualizada con éxito.' });
-        } catch (error) {
-            setModalError({ isOpen: true, mensaje: error.message || 'Error al procesar el cambio de clave.' });
         } finally {
             setIsLoading(false);
         }
@@ -315,93 +243,10 @@ export const DashboardEstudiante = () => {
 
         if (vistaActiva === 'perfil') {
             return (
-                <>
-                    <header className="dashboard-header">
-                        <h1>Mi Perfil</h1>
-                        <p>Gestione su información personal y seguridad de la cuenta</p>
-                    </header>
-                    
-                    <div className="profile-container">
-                        {/* Caja 1: Datos Personales */}
-                        <div className="profile-card">
-                            <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#1565C0' }}>Información Personal</h2>
-                            <form onSubmit={handleUpdatePerfil}>
-                                <InputText
-                                    id="perfil-nombre"
-                                    label="Nombre Completo"
-                                    name="nombre"
-                                    value={perfilForm.nombre}
-                                    onChange={(e) => setPerfilForm({...perfilForm, nombre: e.target.value})}
-                                    required
-                                />
-                                <InputText
-                                    id="perfil-documento"
-                                    label="Documento de Identidad (C.C.)"
-                                    name="documento"
-                                    value={perfilForm.documento}
-                                    onChange={(e) => setPerfilForm({...perfilForm, documento: e.target.value})}
-                                    required
-                                />
-                                <InputText
-                                    id="perfil-telefono"
-                                    label="Número Celular / Teléfono"
-                                    name="telefono"
-                                    value={perfilForm.telefono}
-                                    onChange={(e) => setPerfilForm({...perfilForm, telefono: e.target.value})}
-                                />
-                                <div style={{ marginTop: '1rem', color: '#666', fontSize: '0.85rem' }}>
-                                    <p><strong>Correo Institucional:</strong> {user?.email}</p>
-                                    <p style={{ marginTop: '0.3rem' }}>El correo institucional no puede ser modificado.</p>
-                                </div>
-                                <div style={{ marginTop: '2rem' }}>
-                                    <Button type="submit" variant="primary" disabled={isLoading}>
-                                        {isLoading ? 'Guardando...' : 'Guardar Cambios'}
-                                    </Button>
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Caja 2: Seguridad */}
-                        <div className="profile-card">
-                            <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#1565C0' }}>Seguridad de la Cuenta</h2>
-                            <form onSubmit={handleUpdatePassword}>
-                                <InputText
-                                    id="current-pass"
-                                    label="Contraseña Actual"
-                                    name="currentPassword"
-                                    type="password"
-                                    value={passwordForm.currentPassword}
-                                    onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                                    required
-                                />
-                                <InputText
-                                    id="new-pass"
-                                    label="Nueva Contraseña"
-                                    name="newPassword"
-                                    type="password"
-                                    value={passwordForm.newPassword}
-                                    onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                                    placeholder="Mínimo 6 caracteres"
-                                    required
-                                />
-                                <InputText
-                                    id="confirm-pass"
-                                    label="Confirmar Nueva Contraseña"
-                                    name="confirmPassword"
-                                    type="password"
-                                    value={passwordForm.confirmPassword}
-                                    onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                                    required
-                                />
-                                <div style={{ marginTop: '2rem' }}>
-                                    <Button type="submit" variant="primary" disabled={isLoading}>
-                                        {isLoading ? 'Actualizando...' : 'Cambiar Contraseña'}
-                                    </Button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </>
+                <ProfileView 
+                    user={user} 
+                    onUserUpdate={(updatedUser) => setUser(updatedUser)} 
+                />
             );
         }
 

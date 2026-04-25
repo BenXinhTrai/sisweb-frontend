@@ -1,46 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { Modal } from '../components/Modal';
+import { ProfileView } from '../components/ProfileView';
+import { apiFetch } from '../services/api';
 import './Dashboard.css';
 
-/**
- * Componente funcional DashboardAdmin
- * Traducido desde administrador.html. Permite la gestión global del sistema.
- */
 export const DashboardAdmin = () => {
+    const [vistaActiva, setVistaActiva] = useState('inicio');
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+    const [isLoading, setIsLoading] = useState(false);
+
     // Definición de las opciones del menú lateral
     const opcionesMenu = [
         { id: 'inicio', texto: 'Dashboard Principal' },
         { id: 'usuarios', texto: 'Gestión de Usuarios' },
-        { id: 'configuracion', texto: 'Configuración' },
-        { id: 'reportes', texto: 'Reportes Globales' },
-        { id: 'mantenimiento', texto: 'Mantenimiento' }
+        { id: 'perfil', texto: 'Mi Perfil' }, 
+        { id: 'reportes', texto: 'Reportes Globales' }
     ];
 
-    // Función para manejar el cierre de sesión
     const handleCerrarSesion = () => {
-        window.location.href = '/login'; // Redirige al login
+        localStorage.removeItem('user');
+        window.location.href = '/login';
     };
 
-    // Funciones de acción extraídas del HTML original
-    const handleCrearUsuario = () => {
-        alert('Abriendo modal para crear nuevo usuario...');
-    };
+    const renderVista = () => {
+        if (vistaActiva === 'perfil') {
+            return <ProfileView user={user} onUserUpdate={(updated) => setUser(updated)} />;
+        }
 
-    return (
-        <div className="dashboard-layout">
-            <Sidebar
-                tituloRol="Administrador"
-                opciones={opcionesMenu}
-                onCerrarSesion={handleCerrarSesion}
-            />
-
-            <main className="dashboard-main">
+        return (
+            <>
                 <header className="dashboard-header">
                     <h1>Panel de Control Global</h1>
                     <div className="user-profile">
-                        <span>Bienvenido, Admin</span>
+                        <span>Bienvenido, {user?.nombre || 'Admin'}</span>
                     </div>
                 </header>
 
@@ -102,6 +97,21 @@ export const DashboardAdmin = () => {
                         </table>
                     </Card>
                 </section>
+            </>
+        );
+    };
+
+    return (
+        <div className="dashboard-layout">
+            <Sidebar
+                tituloRol={user ? user.rol.toUpperCase() : "ADMIN"}
+                opciones={opcionesMenu}
+                onCerrarSesion={handleCerrarSesion}
+                onNavegar={(idVista) => setVistaActiva(idVista)}
+            />
+
+            <main className="dashboard-main">
+                {renderVista()}
             </main>
         </div>
     );
