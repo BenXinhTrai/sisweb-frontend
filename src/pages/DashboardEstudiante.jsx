@@ -207,14 +207,7 @@ export const DashboardEstudiante = () => {
                 tituloRol={user ? user.rol.toUpperCase() : "PARTICIPANTE"}
                 opciones={opcionesMenu}
                 onCerrarSesion={handleCerrarSesion}
-                // Adaptamos temporalmente onClick interceptando el contenedor
-                onClick={(e) => {
-                    const targ = e.target.closest('.nav-link');
-                    if (targ) {
-                        e.preventDefault();
-                        setVistaActiva(targ.getAttribute('href').substring(1));
-                    }
-                }}
+                onNavegar={(idVista) => setVistaActiva(idVista)}
             />
 
             <main className="dashboard-main">

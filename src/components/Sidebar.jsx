@@ -10,7 +10,7 @@ import './Sidebar.css';
  * @param {Array} props.opciones - Arreglo de objetos con las opciones del menú { id, texto }.
  * @param {function} props.onCerrarSesion - Función que se ejecuta al presionar el botón de salir.
  */
-export const Sidebar = ({ tituloRol, opciones, onCerrarSesion }) => {
+export const Sidebar = ({ tituloRol, opciones, onCerrarSesion, onNavegar }) => {
     return (
         <aside className="sidebar-container">
             <header className="sidebar-header">
@@ -23,7 +23,16 @@ export const Sidebar = ({ tituloRol, opciones, onCerrarSesion }) => {
                     {/* Iteramos sobre las opciones pasadas por props para generar los enlaces */}
                     {opciones.map((opcion) => (
                         <li key={opcion.id} className="nav-item">
-                            <a href={`#${opcion.id}`} className="nav-link">
+                            <a 
+                                href={`#${opcion.id}`} 
+                                className="nav-link"
+                                onClick={(e) => {
+                                    if (onNavegar) {
+                                        e.preventDefault();
+                                        onNavegar(opcion.id);
+                                    }
+                                }}
+                            >
                                 {opcion.texto}
                             </a>
                         </li>
