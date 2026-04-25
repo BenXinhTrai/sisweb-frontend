@@ -72,7 +72,7 @@ export const DashboardEstudiante = () => {
                 method: 'POST',
                 body: JSON.stringify({
                     id_seminario: id_seminario,
-                    id_participante: user.id_usuario // En TiDB el id_participante logico coincide con id_usuario por ahora
+                    id_usuario: user.id_usuario // Ahora esto es capturado correctamente por el backend
                 })
             });
 
