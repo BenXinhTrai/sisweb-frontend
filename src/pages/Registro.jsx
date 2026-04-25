@@ -17,23 +17,28 @@ export const Registro = () => {
         email: '',
         telefono: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        aceptaPoliticas: false
     });
 
     const [error, setError] = useState('');
 
-    // Función genérica para actualizar el estado cuando el usuario escribe
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, value, type, checked } = e.target;
+        setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 1. Validación de contraseñas coincidentes
+        // 1. Validación de contraseñas coincidentes y políticas
         if (formData.password !== formData.confirmPassword) {
             setError('Las contraseñas no coinciden.');
+            return;
+        }
+
+        if (!formData.aceptaPoliticas) {
+            setError('Debe aceptar la política de privacidad para registrarse.');
             return;
         }
 
@@ -79,11 +84,24 @@ export const Registro = () => {
                     </div>
 
                     <InputText id="nombre" label="Nombre Completo" name="nombre" value={formData.nombre} onChange={handleChange} required />
-                    <InputText id="documento" label="Documento de Identidad" name="documento" value={formData.documento} onChange={handleChange} required />
+                    <InputText id="documento" label="Documento de Identidad (Opcional)" name="documento" value={formData.documento} onChange={handleChange} />
                     <InputText id="email" label="Correo Electrónico" name="email" type="email" value={formData.email} onChange={handleChange} required />
-                    <InputText id="telefono" label="Teléfono" name="telefono" value={formData.telefono} onChange={handleChange} required />
+                    <InputText id="telefono" label="Teléfono (Opcional)" name="telefono" value={formData.telefono} onChange={handleChange} />
                     <InputText id="password" label="Contraseña" name="password" type="password" value={formData.password} onChange={handleChange} required />
                     <InputText id="confirmPassword" label="Confirmar Contraseña" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} required />
+
+                    <div className="checkbox-group" style={{ margin: '1rem 0', textAlign: 'left', fontSize: '0.9rem' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                            <input
+                                type="checkbox"
+                                name="aceptaPoliticas"
+                                checked={formData.aceptaPoliticas}
+                                onChange={handleChange}
+                                required
+                            />
+                            Acepto política de privacidad
+                        </label>
+                    </div>
 
                     <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
                         <Button type="submit" variant="primary">Registrarse</Button>
