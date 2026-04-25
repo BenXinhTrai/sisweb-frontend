@@ -32,6 +32,13 @@ export const DashboardEstudiante = () => {
         telefono: user?.telefono || ''
     });
 
+    // Estado para el cambio de contraseña
+    const [passwordForm, setPasswordForm] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
+
     const opcionesMenu = [
         { id: 'inicio', texto: 'Mi Dashboard' },
         { id: 'catalogo', texto: 'Catálogo de Seminarios' },
@@ -115,6 +122,41 @@ export const DashboardEstudiante = () => {
             });
         } catch (error) {
             setModalError({ isOpen: true, mensaje: error.message || 'Error al actualizar perfil' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleUpdatePassword = async (e) => {
+        e.preventDefault();
+
+        // Validaciones básicas de cliente
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            setModalError({ isOpen: true, mensaje: 'Las nuevas contraseñas no coinciden.' });
+            return;
+        }
+
+        if (passwordForm.newPassword.length < 6) {
+            setModalError({ isOpen: true, mensaje: 'La contraseña debe tener al menos 6 caracteres por seguridad.' });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const res = await apiFetch('/cambiar-password', {
+                method: 'POST',
+                body: JSON.stringify({
+                    id_usuario: user.id_usuario,
+                    currentPassword: passwordForm.currentPassword,
+                    newPassword: passwordForm.newPassword
+                })
+            });
+
+            // Limpiar formulario y avisar
+            setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            setModalExito({ isOpen: true, mensaje: res.mensaje || 'Tu contraseña ha sido actualizada con éxito.' });
+        } catch (error) {
+            setModalError({ isOpen: true, mensaje: error.message || 'Error al procesar el cambio de clave.' });
         } finally {
             setIsLoading(false);
         }
@@ -310,6 +352,45 @@ export const DashboardEstudiante = () => {
                             <div style={{ marginTop: '2rem' }}>
                                 <Button type="submit" variant="primary" disabled={isLoading}>
                                     {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div style={{ maxWidth: '600px', backgroundColor: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '2rem' }}>
+                        <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', color: '#1565C0' }}>Seguridad de la Cuenta</h2>
+                        <form onSubmit={handleUpdatePassword}>
+                            <InputText
+                                id="current-pass"
+                                label="Contraseña Actual"
+                                name="currentPassword"
+                                type="password"
+                                value={passwordForm.currentPassword}
+                                onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                                required
+                            />
+                            <InputText
+                                id="new-pass"
+                                label="Nueva Contraseña"
+                                name="newPassword"
+                                type="password"
+                                value={passwordForm.newPassword}
+                                onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                                placeholder="Mínimo 6 caracteres"
+                                required
+                            />
+                            <InputText
+                                id="confirm-pass"
+                                label="Confirmar Nueva Contraseña"
+                                name="confirmPassword"
+                                type="password"
+                                value={passwordForm.confirmPassword}
+                                onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                                required
+                            />
+                            <div style={{ marginTop: '2rem' }}>
+                                <Button type="submit" variant="secondary" disabled={isLoading}>
+                                    {isLoading ? 'Actualizando...' : 'Cambiar Contraseña'}
                                 </Button>
                             </div>
                         </form>
