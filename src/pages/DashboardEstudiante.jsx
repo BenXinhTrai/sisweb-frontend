@@ -3,6 +3,7 @@ import { Sidebar } from '../components/Sidebar';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Modal } from '../components/Modal';
+import { InputText } from '../components/InputText';
 import { apiFetch } from '../services/api';
 import { descargarCertificadoPDF } from '../utils/generarCertificado';
 import './Dashboard.css';
